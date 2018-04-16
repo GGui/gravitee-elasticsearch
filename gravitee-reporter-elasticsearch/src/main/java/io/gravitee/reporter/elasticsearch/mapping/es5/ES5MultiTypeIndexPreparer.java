@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.gravitee.reporter.elasticsearch.mapping;
+package io.gravitee.reporter.elasticsearch.mapping.es5;
 
 import io.gravitee.reporter.elasticsearch.config.PipelineConfiguration;
+import io.gravitee.reporter.elasticsearch.mapping.AbstractIndexPreparer;
 import io.reactivex.Completable;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -23,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author David BRASSELY (david.brassely at graviteesource.com)
  * @author GraviteeSource Team
  */
-public class ES5IndexPreparer extends AbstractIndexPreparer {
+public class ES5MultiTypeIndexPreparer extends AbstractIndexPreparer {
 
     /**
      * Configuration of pipelineConfiguration
