@@ -41,6 +41,7 @@ import java.util.*;
  *
  * @author Azize ELAMRANI (azize.elamrani at graviteesource.com)
  * @author GraviteeSource Team
+ * @autor Guillaume Gillon
  */
 public class AverageDateHistogramCommand extends AbstractElasticsearchQueryCommand<DateHistogramResponse> {
 
@@ -60,15 +61,23 @@ public class AverageDateHistogramCommand extends AbstractElasticsearchQueryComma
 	public DateHistogramResponse executeQuery(Query<DateHistogramResponse> query) throws AnalyticsException {
 		final DateHistogramQuery dateHistogramQuery = (DateHistogramQuery) query;
 
-		final String sQuery = this.createQuery(TEMPLATE, dateHistogramQuery);
+        Long to = dateHistogramQuery.timeRange().range().to();
+        Long from = dateHistogramQuery.timeRange().range().from();
+
+        //"from" and "to" are rounded according to the internal. It allows to exec the same request during the "interval" and make use of ES cache
+        Long roundedFrom = null;
+        if (from != null)
+            roundedFrom = (from.longValue() / dateHistogramQuery.timeRange().interval().toMillis()) * dateHistogramQuery.timeRange().interval().toMillis();
+        Long roundedTo = null;
+        if (to != null)
+            roundedTo = (to.longValue() / dateHistogramQuery.timeRange().interval().toMillis()) * dateHistogramQuery.timeRange().interval().toMillis();
+
+
+        final String sQuery = this.createQuery(TEMPLATE, dateHistogramQuery, roundedFrom, roundedTo);
 
 		try {
-			final long to;
-			final long from;
-			if (dateHistogramQuery.timeRange().range().to() != null) {
-				to = dateHistogramQuery.timeRange().range().to();
-				from = dateHistogramQuery.timeRange().range().from();
-			} else {
+
+			if (to == null) {
 				to = System.currentTimeMillis();
 				from = ZonedDateTime
 						.ofInstant(Instant.ofEpochMilli(to), ZoneId.systemDefault())
